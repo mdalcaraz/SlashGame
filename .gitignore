@@ -13,7 +13,7 @@ Build
 **/AncientTreasures
 **/AncientContent
 **/ParagonMinions
-DefaultEngine.ini
+**/DefaultEngine.ini
 
 .vscode
 .vs
