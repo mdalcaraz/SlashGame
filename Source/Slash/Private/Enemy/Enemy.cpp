@@ -32,9 +32,23 @@ void AEnemy::BeginPlay()
 	
 	if (Attributes && HealthBarWidget)
 	{
+		HealthBarWidget->SetVisibility(false);
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
 	}
 
+}
+
+void AEnemy::Die(const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
+	}
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(10.f);
 }
 
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
@@ -51,6 +65,18 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CombatTarget)
+	{
+		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
+		if (DistanceToTarget > Combatradius)
+		{
+			CombatTarget = nullptr;
+			if (HealthBarWidget)
+			{
+				HealthBarWidget->SetVisibility(false);
+			}
+		}
+	}
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -63,7 +89,14 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 
-	DirectionalHitReact(ImpactPoint);
+	if (Attributes && Attributes->IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
+	else
+	{
+		DirectionalDie(ImpactPoint);
+	}
 
 	if (HitSound)
 	{
@@ -83,7 +116,107 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 	}
 }
 
+void AEnemy::DirectionalDie(const FVector& ImpactPoint)
+{
+	const FVector Forward = GetActorForwardVector();
+	// Lower Impact Point to the Enemy's Actor Location Z
+	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
+	const FVector ToHit = (ImpactLowered - GetActorLocation()).GetSafeNormal();
+
+	// Forward * ToHit = |Forward||ToHit| * cos(theta)
+	// |Forward| = 1, |ToHit| = 1, so Forward * ToHit = cos(theta)
+	const double CosTheta = FVector::DotProduct(Forward, ToHit);
+	// Take the inverse cosine (arc-cosine) of cos(theta) to get theta
+	double Theta = FMath::Acos(CosTheta);
+	// convert from radians to degrees
+	Theta = FMath::RadiansToDegrees(Theta);
+
+	// if CrossProduct points down, Theta should be negative
+	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
+	if (CrossProduct.Z < 0)
+	{
+		Theta *= -1.f;
+	}
+	FName Section;
+
+	if (Theta >= -45.f && Theta < 45.f)
+	{
+		switch (FMath::RandRange(0, 1))
+		{
+		case 0:
+			Section = FName("Death_Back_1");
+			DeathPose = EDeathPose::EDP_Death_Back_1;
+			break;
+		case 1:
+			Section = FName("Death_Back_2");
+			DeathPose = EDeathPose::EDP_Death_Back_2;
+			break;
+		}
+	}
+	else if (Theta >= -135.f && Theta < -45.f)
+	{
+		switch (FMath::RandRange(0, 1))
+		{
+			case 0:
+				Section = FName("Death_Right_1");
+				DeathPose = EDeathPose::EDP_Death_Right_1;
+				break;
+			case 1:
+				Section = FName("Death_Right_2");
+				DeathPose = EDeathPose::EDP_Death_Right_2;
+				break;
+		}
+	}
+	else if (Theta >= 45.f && Theta < 135.f)
+	{
+		switch (FMath::RandRange(0, 1))
+		{
+		case 0:
+			Section = FName("Death_Left_1");
+			DeathPose = EDeathPose::EDP_Death_Left_1;
+			break;
+		case 1:
+			Section = FName("Death_Left_2");
+			DeathPose = EDeathPose::EDP_Death_Left_2;
+			break;
+		}
+	}
+	else
+	{
+		switch (FMath::RandRange(0, 1))
+		{
+		case 0:
+			Section = FName("Death_Front_1");
+			DeathPose = EDeathPose::EDP_Death_Right_1;
+			break;
+		case 1:
+			Section = FName("Death_Front_2");
+			DeathPose = EDeathPose::EDP_Death_Right_2;
+			break;
+		}
+
+	}
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(false);
+	}
+
+	Die(Section);
+
+	/*
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 100.f, 5.f, FColor::Blue, 5.f);
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, FString::Printf(TEXT("Theta: %f"), Theta));
+	}
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
+	*/
+}
+
 void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
+
 {
 	const FVector Forward = GetActorForwardVector();
 	// Lower Impact Point to the Enemy's Actor Location Z
@@ -138,8 +271,11 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	if (Attributes && HealthBarWidget)
 	{
+		HealthBarWidget->SetVisibility(true);
+
 		Attributes->ReceiveDamage(DamageAmount);
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
 	}
+	CombatTarget = EventInstigator->GetPawn();
 	return DamageAmount;
 }
