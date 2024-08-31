@@ -57,6 +57,15 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* EmbersEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Item Scale")
+	FVector Scale = FVector(1,1,1);
+	
+	UPROPERTY(EditAnywhere, Category = "Item Scale")
+	FVector RelativePosition = FVector();
+
+	UPROPERTY(EditAnywhere, Category = "Item Scale")
+	FRotator RelativeRotation = FRotator();
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime;

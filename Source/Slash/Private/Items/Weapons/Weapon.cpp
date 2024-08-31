@@ -25,6 +25,19 @@ AWeapon::AWeapon()
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
 }
 
+void AWeapon::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	/*if(ItemMesh && ItemState == EItemState::EIS_Equipped)
+	{
+		ItemMesh->SetWorldScale3D(Scale);
+		ItemMesh->SetRelativeLocation(RelativePosition);
+		ItemMesh->SetRelativeRotation(RelativeRotation);
+	}*/
+	
+}
+
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -37,6 +50,11 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOw
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
 	AttachMeshToSocket(InParent, InSocketName);
+	ItemMesh->SetWorldScale3D(Scale);
+	ItemMesh->SetRelativeLocation(RelativePosition);
+	ItemMesh->SetRelativeRotation(RelativeRotation);
+
+
 	ItemState = EItemState::EIS_Equipped;
 	if (EquipSound)
 	{

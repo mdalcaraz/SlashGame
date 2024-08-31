@@ -100,7 +100,8 @@ void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 		OverlappingItem = nullptr;
 		EquippedWeapon = OverlappingWeapon;
-		//CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;
+	/*	OverlappingWeapon->Equip(GetMesh(), FName("TwoHandSocket"), this, this);
+		CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;*/
 	}
 	else
 	{
