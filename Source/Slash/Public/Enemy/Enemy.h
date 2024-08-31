@@ -51,8 +51,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 	UParticleSystem* HitParticles;
 
-	UPROPERTY()
-	AActor* CombatTarget;
+
 
 	UPROPERTY(EditAnywhere)
 	double Combatradius = 500.f;
@@ -69,6 +68,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	EDeathPose DeathPose = EDeathPose::EDP_Alive;
+
+	UPROPERTY(BlueprintReadWrite)
+	AActor* CombatTarget;
 public:	
 	
 };
