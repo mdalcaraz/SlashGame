@@ -51,10 +51,23 @@ private:
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 	UParticleSystem* HitParticles;
 
-
-
 	UPROPERTY(EditAnywhere)
 	double Combatradius = 500.f;
+
+	/* 
+	*	Navigations 
+	*/
+	UPROPERTY()
+	class AAIController* EnemyController;
+
+	//Current patrol target
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	AActor* PatrolTarget;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
+	TArray<AActor*> PatrolTargets;
+
+
 
 protected:
 	virtual void BeginPlay() override;
