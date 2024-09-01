@@ -11,6 +11,7 @@
 class UAnimMontage;
 class UAttributeComponent;
 class UHealthBarComponent;
+class UPawnSensingComponent;
 
 UCLASS()
 class SLASH_API AEnemy : public ACharacter, public IHitInterface
@@ -31,12 +32,17 @@ public:
 
 
 private:
-
+	/*
+	* Components
+	*/
 	UPROPERTY(VisibleAnywhere)
 	UAttributeComponent* Attributes;
 
 	UPROPERTY(VIsibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
+
+	UPROPERTY(VIsibleAnywhere)
+	UPawnSensingComponent* PawnSensing;
 
 	/**
 	* Animation montages
@@ -54,8 +60,10 @@ private:
 	UParticleSystem* HitParticles;
 
 	UPROPERTY(EditAnywhere)
-	double CombatRadius = 1000.f;
+	double CombatRadius = 500.f;
 
+	UPROPERTY(EditAnywhere)
+	double AttackRadius = 150.f;
 	/* 
 	*	Navigations 
 	*/
@@ -76,10 +84,12 @@ private:
 	void PatrolTimerFinished();
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMin = 5.f;
+	float WaitMin = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMax = 10.f;
+	float WaitMax = 3.f;
+
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 protected:
 	virtual void BeginPlay() override;
@@ -88,6 +98,8 @@ protected:
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
+	UFUNCTION()
+	void PawnSeen(APawn* SeenPawn);
 
 	/**
 	* Play montage functions
