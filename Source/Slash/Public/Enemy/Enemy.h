@@ -21,6 +21,8 @@ public:
 	AEnemy();
 	
 	virtual void Tick(float DeltaTime) override;
+	void CheckPatrolTarget();
+	void CheckCombatTarget();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 	void DirectionalHitReact(const FVector& ImpactPoint);
@@ -52,7 +54,7 @@ private:
 	UParticleSystem* HitParticles;
 
 	UPROPERTY(EditAnywhere)
-	double Combatradius = 500.f;
+	double CombatRadius = 1000.f;
 
 	/* 
 	*	Navigations 
@@ -67,12 +69,25 @@ private:
 	UPROPERTY(EditInstanceOnly, Category = "AI Navigation")
 	TArray<AActor*> PatrolTargets;
 
+	UPROPERTY(EditAnywhere)
+	double PatrolRadius = 200.f;
 
+	FTimerHandle PatrolTimer;
+	void PatrolTimerFinished();
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMin = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMax = 10.f;
 
 protected:
 	virtual void BeginPlay() override;
 
 	void Die(const FName& SectionName);
+	bool InTargetRange(AActor* Target, double Radius);
+	void MoveToTarget(AActor* Target);
+	AActor* ChoosePatrolTarget();
 
 	/**
 	* Play montage functions
@@ -82,7 +97,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	EDeathPose DeathPose = EDeathPose::EDP_Alive;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI Navigation")
 	AActor* CombatTarget;
 public:	
 	
