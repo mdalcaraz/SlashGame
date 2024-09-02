@@ -9,8 +9,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/AttributeComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Items/Weapons/Weapon.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Items/ItemsTypes.h"
 
 #include "Slash/DebugMacros.h"
 
@@ -61,6 +63,15 @@ void AEnemy::BeginPlay()
 		PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	}
 
+	UWorld* World = GetWorld();
+	if (World && WeaponClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
+		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		EquippedWeapon = DefaultWeapon;
+		WeaponHand = DefaultWeapon->OccupedHand;
+	}
+
 }
 
 void AEnemy::Die(const FName& SectionName)
@@ -89,7 +100,7 @@ void AEnemy::MoveToTarget(AActor* Target)
 
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(Target);
-	MoveRequest.SetAcceptanceRadius(15.f);
+	MoveRequest.SetAcceptanceRadius(50.f);
 	EnemyController->MoveTo(MoveRequest);
 }
 
@@ -131,6 +142,61 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 		}
 	}
 
+}
+
+void AEnemy::Attack(const FInputActionValue& Value)
+{
+	Super::Attack(Value);
+	PlayAttackMontage();
+}
+
+void AEnemy::PlayAttackMontage()
+{
+	Super::PlayAttackMontage();
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		const int32 Selection = FMath::RandRange(0, 2);
+		FName SectionName = FName();
+		if (WeaponHand == EOcuppedHand::EOC_Right)
+		{
+			switch (Selection)
+			{
+			case 0:
+				SectionName = FName("Attack1");
+				break;
+			case 1:
+				SectionName = FName("Attack2");
+				break;
+			case 2:
+				SectionName = FName("Attack3");
+				break;
+			default:
+				break;
+			}
+		}
+		else if (WeaponHand == EOcuppedHand::EOC_Both)
+		{
+			switch (Selection)
+			{
+			case 0:
+				SectionName = FName("Attack1_TwoHanded");
+				break;
+			case 1:
+				SectionName = FName("Attack2_TwoHanded");
+				break;
+			case 2:
+				SectionName = FName("Attack2_TwoHanded");
+				break;
+			default:
+				break;
+			}
+		}
+
+		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+	}
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -181,6 +247,7 @@ void AEnemy::CheckCombatTarget()
 		// Inside attack range, attack character
 		EnemyState = EEnemyState::EES_Atttacking;
 		//TODO: Attack montage
+		Attack(FInputActionValue());
 	}
 
 
@@ -238,4 +305,12 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 
 	return DamageAmount;
+}
+
+void AEnemy::Destroyed()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
 }

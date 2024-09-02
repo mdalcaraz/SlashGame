@@ -139,6 +139,8 @@ void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 
 void ASlashCharacter::Attack(const FInputActionValue& Value)
 {
+	Super::Attack(Value);
+
 	if (CanAttack())
 	{
 		PlayAttackMontage();
@@ -218,6 +220,8 @@ void ASlashCharacter::FinishEquipping()
 
 void ASlashCharacter::PlayAttackMontage()
 {
+	Super::PlayAttackMontage();
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && AttackMontage)
 	{

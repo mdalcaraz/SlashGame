@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Interfaces/HitInterface.h"
 #include "Characters/CharacterTypes.h"
+#include "Items/ItemsTypes.h"
 
 #include "BaseCharacter.generated.h"
 
@@ -32,6 +33,7 @@ public:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	void DirectionalDie(const FVector& ImpactPoint);
 
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Attack(const FInputActionValue& Value);
@@ -49,8 +51,6 @@ protected:
 	virtual void AttackEnd();
 
 
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	AWeapon* EquippedWeapon;
 
 	/**
 	* Animation montages
@@ -84,4 +84,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 	UParticleSystem* HitParticles;
 
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	AWeapon* EquippedWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	EOcuppedHand WeaponHand;
 };

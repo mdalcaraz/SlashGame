@@ -26,19 +26,14 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	virtual void Destroyed() override;
 
 private:
-
-
-
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> WeaponClass;
 
 	UPROPERTY(VIsibleAnywhere)
 	UPawnSensingComponent* PawnSensing;
-
-	/**
-	* Animation montages
-	*/
-
 
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 500.f;
@@ -81,6 +76,9 @@ protected:
 	AActor* ChoosePatrolTarget();
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn);
+	virtual void Attack(const FInputActionValue& Value) override;
+	virtual void PlayAttackMontage() override;
+
 
 
 
