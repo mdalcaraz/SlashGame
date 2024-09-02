@@ -10,6 +10,7 @@
 #include "GroomComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
+#include "Items/ItemsTypes.h"
 #include "Animation/AnimMontage.h"
 #include "Components/BoxComponent.h"
 
@@ -92,16 +93,25 @@ void ASlashCharacter::Jump(const FInputActionValue& Value)
 
 void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 {
-
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
-		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
-		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-		OverlappingItem = nullptr;
-		EquippedWeapon = OverlappingWeapon;
-	/*	OverlappingWeapon->Equip(GetMesh(), FName("TwoHandSocket"), this, this);
-		CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;*/
+		if(OverlappingWeapon->OccupedHand == EOcuppedHand::EOC_Right)
+		{
+			OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+			WeaponHand = EOcuppedHand::EOC_Right;
+			OverlappingItem = nullptr;
+			EquippedWeapon = OverlappingWeapon;
+		}
+		else if (OverlappingWeapon->OccupedHand == EOcuppedHand::EOC_Both)
+		{
+			OverlappingWeapon->Equip(GetMesh(), FName("TwoHandSocket"), this, this);
+			CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;
+			WeaponHand = EOcuppedHand::EOC_Both;
+			OverlappingItem = nullptr;
+			EquippedWeapon = OverlappingWeapon;
+		}
 	}
 	else
 	{
@@ -114,7 +124,14 @@ void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 		else if (CanArm())
 		{
 			PlayEquipMontage(FName("Equip"));
-			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+			if (WeaponHand == EOcuppedHand::EOC_Right)
+			{
+				CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+			}
+			else if (WeaponHand == EOcuppedHand::EOC_Both)
+			{
+				CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;
+			}
 			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 	}
@@ -193,7 +210,14 @@ void ASlashCharacter::Arm()
 {
 	if (EquippedWeapon)
 	{
-		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+		if (WeaponHand == EOcuppedHand::EOC_Right)
+		{
+			EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+		}
+		else if (WeaponHand == EOcuppedHand::EOC_Both)
+		{
+			EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("TwoHandSocket"));
+		}
 	}
 }
 
@@ -210,17 +234,35 @@ void ASlashCharacter::PlayAttackMontage()
 		AnimInstance->Montage_Play(AttackMontage);
 		const int32 Selection = FMath::RandRange(0, 1);
 		FName SectionName = FName();
-		switch (Selection)
+		if(WeaponHand == EOcuppedHand::EOC_Right)
 		{
-		case 0:
-			SectionName = FName("Attack1");
-			break;
-		case 1:
-			SectionName = FName("Attack2");
-			break;
-		default:
-			break;
+			switch (Selection)
+			{
+			case 0:
+				SectionName = FName("Attack1");
+				break;
+			case 1:
+				SectionName = FName("Attack2");
+				break;
+			default:
+				break;
+			}
 		}
+		else if(WeaponHand == EOcuppedHand::EOC_Both)
+		{
+			switch (Selection)
+			{
+			case 0:
+				SectionName = FName("Attack1_TwoHanded");
+				break;
+			case 1:
+				SectionName = FName("Attack2_TwoHanded");
+				break;
+			default:
+				break;
+			}
+		}
+		
 		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	}
 }

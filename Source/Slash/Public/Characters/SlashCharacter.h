@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "CharacterTypes.h"
+#include "Items/ItemsTypes.h"
 #include "SlashCharacter.generated.h"
 
 class UInputAction;
@@ -107,6 +108,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	EOcuppedHand WeaponHand;
 
 	/** 
 	* Animation montages

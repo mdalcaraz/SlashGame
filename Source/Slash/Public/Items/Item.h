@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ItemsTypes.h"
 #include "Item.generated.h"
 
 class USphereComponent;
@@ -22,6 +23,12 @@ class SLASH_API AItem : public AActor
 public:	
 	AItem();
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Item Type")
+	EItemType ItemType = EItemType::EIT_GenericItem;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Item Type")
+	EOcuppedHand OccupedHand = EOcuppedHand::EOC_None;
 protected:
 	virtual void BeginPlay() override;
 
@@ -66,6 +73,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Item Scale")
 	FRotator RelativeRotation = FRotator();
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float RunningTime;
