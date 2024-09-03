@@ -38,14 +38,15 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Attack(const FInputActionValue& Value);
 	virtual void Die(const FName& SectionName);
+	void PlayHitSound(const FVector& ImpactPoint);
+	void SpawnHitParticules(const FVector& ImpactPoint);
+	virtual void HandleDamage(float DamageAmount);
 
-	/**
-	* Play montage functions
-	*/
 	virtual void PlayAttackMontage();
 	void PlayHitReactMontage(const FName& SectionName);
 
 	virtual bool CanAttack();
+	bool IsAlive();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
@@ -62,7 +63,7 @@ protected:
 	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(BlueprintReadOnly)
-	EDeathPose DeathPose = EDeathPose::EDP_Alive;
+	EDeathPose DeathPose;
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* DeathMontage;
@@ -77,16 +78,16 @@ protected:
 	UPROPERTY(VIsibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
 
-
-	UPROPERTY(EditAnywhere, Category = Sounds)
-	USoundBase* HitSound;
-
-	UPROPERTY(EditAnywhere, Category = VisualEffects)
-	UParticleSystem* HitParticles;
-
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	EOcuppedHand WeaponHand;
+
+private:
+	UPROPERTY(EditAnywhere, Category = Sounds)
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = VisualEffects)
+	UParticleSystem* HitParticles;
 };
