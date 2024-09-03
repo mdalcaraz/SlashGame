@@ -38,12 +38,15 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Attack(const FInputActionValue& Value);
 	virtual void Die(const FName& SectionName);
+	virtual void HandleDamage(float DamageAmount);
+	
+	void DisableCapsule();
 	void PlayHitSound(const FVector& ImpactPoint);
 	void SpawnHitParticules(const FVector& ImpactPoint);
-	virtual void HandleDamage(float DamageAmount);
-
-	virtual void PlayAttackMontage();
+	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	void PlayHitReactMontage(const FName& SectionName);
+	int32 PlayAttackMontage();
+	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
 	virtual bool CanAttack();
 	bool IsAlive();
@@ -51,24 +54,56 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
 
-
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	EOcuppedHand WeaponOcuppedHand = EOcuppedHand::EOC_None;
+	
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	EItemType	 WeaponEquippedType = EItemType::EOC_None;
 
 	/**
 	* Animation montages
 	*/
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(BlueprintReadOnly)
 	EDeathPose DeathPose;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	UAnimMontage* DeathMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* FrontDeathMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* BackDeathMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* LeftDeathMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Montages")
+	UAnimMontage* RightDeathMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> NoWeaponAttackMontageSections;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> SwordOneHandAttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> SwordTwoHandAttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> AxeOneHandAttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> AxeTwoHandAttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> HammerOneHandAttackMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FName> HammerTwoHandAttackMontageSections;
 	/*
 	* Components
 	*/
@@ -80,9 +115,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
-
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	EOcuppedHand WeaponHand;
 
 private:
 	UPROPERTY(EditAnywhere, Category = Sounds)

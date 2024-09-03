@@ -138,7 +138,7 @@ void AEnemy::BeginPlay()
 	
 	if (Attributes && HealthBarWidget)
 	{
-		HealthBarWidget->SetVisibility(false);
+		HideHealthBar();
 		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
 	}
 
@@ -156,21 +156,25 @@ void AEnemy::BeginPlay()
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
 		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
-		WeaponHand = DefaultWeapon->OccupedHand;
+		WeaponOcuppedHand = DefaultWeapon->OccupedHand;
 	}
 }
 
 void AEnemy::Die(const FName& SectionName)
 {
+	EnemyState = EEnemyState::EES_Dead;
+	ClearAttackTimer();
+
+	//TODO: Refactor
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && DeathMontage)
 	{
 		AnimInstance->Montage_Play(DeathMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
 	}
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(10.f);
+	DisableCapsule();
+	SetLifeSpan(DeathLifeSpan);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 bool AEnemy::InTargetRange(AActor* Target, double Radius)
@@ -235,55 +239,6 @@ void AEnemy::Attack(const FInputActionValue& Value = FInputActionValue())
 void AEnemy::IA_Attack()
 {
 	Attack();
-}
-
-void AEnemy::PlayAttackMontage()
-{
-	Super::PlayAttackMontage();
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && AttackMontage)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, 2);
-		FName SectionName = FName();
-		if (WeaponHand == EOcuppedHand::EOC_Right)
-		{
-			switch (Selection)
-			{
-			case 0:
-				SectionName = FName("Attack1");
-				break;
-			case 1:
-				SectionName = FName("Attack2");
-				break;
-			case 2:
-				SectionName = FName("Attack3");
-				break;
-			default:
-				break;
-			}
-		}
-		else if (WeaponHand == EOcuppedHand::EOC_Both)
-		{
-			switch (Selection)
-			{
-			case 0:
-				SectionName = FName("Attack1_TwoHanded");
-				break;
-			case 1:
-				SectionName = FName("Attack2_TwoHanded");
-				break;
-			case 2:
-				SectionName = FName("Attack2_TwoHanded");
-				break;
-			default:
-				break;
-			}
-		}
-
-		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
-	}
 }
 
 bool AEnemy::CanAttack()

@@ -112,7 +112,6 @@ protected:
 	void PawnSeen(APawn* SeenPawn);
 	virtual void Attack(const FInputActionValue& Value);
 	void IA_Attack();
-	virtual void PlayAttackMontage() override;
 	virtual bool CanAttack() override;
 	virtual void HandleDamage(float DamageAmount) override;
 
@@ -121,6 +120,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	float DeathLifeSpan = 8.f;
 public:	
 	
 };

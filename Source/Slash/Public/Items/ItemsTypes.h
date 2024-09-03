@@ -3,6 +3,7 @@
 UENUM(BlueprintType)
 enum class EItemType : uint8
 {
+	EOC_None UMETA(DisplayName = "None"),
 	EIT_GenericItem UMETA(DisplayName = "Generic Item"),
 	EIT_Sword UMETA(DisplayName = "Sword"),
 	EIT_Axe UMETA(DisplayName = "Axe"),

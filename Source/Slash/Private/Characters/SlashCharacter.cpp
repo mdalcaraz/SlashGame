@@ -100,17 +100,19 @@ void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 		{
 			OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
-			WeaponHand = EOcuppedHand::EOC_Right;
 			OverlappingItem = nullptr;
 			EquippedWeapon = OverlappingWeapon;
+			WeaponEquippedType = OverlappingWeapon->ItemType;
+			WeaponOcuppedHand = OverlappingWeapon->OccupedHand;
 		}
 		else if (OverlappingWeapon->OccupedHand == EOcuppedHand::EOC_Both)
 		{
 			OverlappingWeapon->Equip(GetMesh(), FName("TwoHandSocket"), this, this);
 			CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;
-			WeaponHand = EOcuppedHand::EOC_Both;
 			OverlappingItem = nullptr;
 			EquippedWeapon = OverlappingWeapon;
+			WeaponEquippedType = OverlappingWeapon->ItemType;
+			WeaponOcuppedHand = OverlappingWeapon->OccupedHand;
 		}
 	}
 	else
@@ -124,11 +126,11 @@ void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 		else if (CanArm())
 		{
 			PlayEquipMontage(FName("Equip"));
-			if (WeaponHand == EOcuppedHand::EOC_Right)
+			if (WeaponOcuppedHand == EOcuppedHand::EOC_Right)
 			{
 				CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 			}
-			else if (WeaponHand == EOcuppedHand::EOC_Both)
+			else if (WeaponOcuppedHand == EOcuppedHand::EOC_Both)
 			{
 				CharacterState = ECharacterState::ECS_EquippedTwoHandedWeapon;
 			}
@@ -202,11 +204,11 @@ void ASlashCharacter::Arm()
 {
 	if (EquippedWeapon)
 	{
-		if (WeaponHand == EOcuppedHand::EOC_Right)
+		if (WeaponOcuppedHand == EOcuppedHand::EOC_Right)
 		{
 			EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
 		}
-		else if (WeaponHand == EOcuppedHand::EOC_Both)
+		else if (WeaponOcuppedHand == EOcuppedHand::EOC_Both)
 		{
 			EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("TwoHandSocket"));
 		}
@@ -216,49 +218,6 @@ void ASlashCharacter::Arm()
 void ASlashCharacter::FinishEquipping()
 {
 	ActionState = EActionState::EAS_Unoccupied;
-}
-
-void ASlashCharacter::PlayAttackMontage()
-{
-	Super::PlayAttackMontage();
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && AttackMontage)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0, 1);
-		FName SectionName = FName();
-		if(WeaponHand == EOcuppedHand::EOC_Right)
-		{
-			switch (Selection)
-			{
-			case 0:
-				SectionName = FName("Attack1");
-				break;
-			case 1:
-				SectionName = FName("Attack2");
-				break;
-			default:
-				break;
-			}
-		}
-		else if(WeaponHand == EOcuppedHand::EOC_Both)
-		{
-			switch (Selection)
-			{
-			case 0:
-				SectionName = FName("Attack1_TwoHanded");
-				break;
-			case 1:
-				SectionName = FName("Attack2_TwoHanded");
-				break;
-			default:
-				break;
-			}
-		}
-		
-		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
-	}
 }
 
 void ASlashCharacter::PlayEquipMontage(const FName& SectionName)

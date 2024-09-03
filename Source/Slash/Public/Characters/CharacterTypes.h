@@ -38,3 +38,12 @@ enum class EEnemyState : uint8
 	EES_Atttacking	UMETA(DisplayName = "Attacking"),
 	EES_Engaged		UMETA(DisplayName = "Engaged"),
 };
+
+UENUM(BlueprintType)
+enum class EDirection : uint8
+{
+	ED_Front		UMETA(DisplayName = "Front"),
+	ED_Back			UMETA(DisplayName = "Back"),
+	ED_Left			UMETA(DisplayName = "Left"),
+	ED_Right		UMETA(DisplayName = "Right"),
+};

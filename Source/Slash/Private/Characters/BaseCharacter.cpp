@@ -3,6 +3,7 @@
 
 #include "Characters/BaseCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Items/Weapons/Weapon.h"
 #include "EnhancedInputComponent.h"
 #include "HUD/HealthBarComponent.h"
@@ -34,6 +35,11 @@ void ABaseCharacter::Attack(const FInputActionValue& Value)
 
 void ABaseCharacter::Die(const FName& SectionName)
 {
+}
+
+void ABaseCharacter::DisableCapsule()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)
@@ -78,8 +84,62 @@ void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
 	}
 }
 
-void ABaseCharacter::PlayAttackMontage()
+int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames)
 {
+	if (SectionNames.Num() <= 0) return 0;
+	const int32 MaxSectionIndex = SectionNames.Num() - 1;
+	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
+	PlayMontageSection(Montage, SectionNames[Selection]);
+	return Selection;
+}
+
+int32 ABaseCharacter::PlayAttackMontage()
+{
+	switch (WeaponEquippedType)
+	{
+	case EItemType::EIT_Sword:
+		if (WeaponOcuppedHand == EOcuppedHand::EOC_Right)
+		{
+			return PlayRandomMontageSection(AttackMontage, SwordOneHandAttackMontageSections);
+		}
+		else if(WeaponOcuppedHand == EOcuppedHand::EOC_Both)
+		{
+			return PlayRandomMontageSection(AttackMontage, SwordTwoHandAttackMontageSections);
+		}
+		break;
+	case EItemType::EIT_Axe:
+		if (WeaponOcuppedHand == EOcuppedHand::EOC_Right)
+		{
+			return PlayRandomMontageSection(AttackMontage, AxeOneHandAttackMontageSections);
+		}
+		else if (WeaponOcuppedHand == EOcuppedHand::EOC_Both)
+		{
+			return PlayRandomMontageSection(AttackMontage, AxeTwoHandAttackMontageSections);
+		}
+		break;
+	case EItemType::EIT_Hammer:
+		if (WeaponOcuppedHand == EOcuppedHand::EOC_Right)
+		{
+			return PlayRandomMontageSection(AttackMontage, HammerOneHandAttackMontageSections);
+		}
+		else if (WeaponOcuppedHand == EOcuppedHand::EOC_Both)
+		{
+			return PlayRandomMontageSection(AttackMontage, HammerTwoHandAttackMontageSections);
+		}
+		break;
+	}
+	return PlayRandomMontageSection(AttackMontage, NoWeaponAttackMontageSections);
+
+}
+
+void ABaseCharacter::PlayMontageSection(UAnimMontage* Montage, const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && Montage)
+	{
+		AnimInstance->Montage_Play(Montage);
+		AnimInstance->Montage_JumpToSection(SectionName, Montage);
+	}
 }
 
 bool ABaseCharacter::CanAttack()
