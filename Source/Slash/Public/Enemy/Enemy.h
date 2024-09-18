@@ -35,10 +35,10 @@ private:
 	UPawnSensingComponent* PawnSensing;
 
 	UPROPERTY(EditAnywhere)
-	double CombatRadius = 500.f;
+	double CombatRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	double AttackRadius = 150.f;
+	double AttackRadius = 120.f;
 	/* 
 	*	Navigations 
 	*/
@@ -59,10 +59,10 @@ private:
 	void PatrolTimerFinished();
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMin = 1.f;
+	float PatrolWaitMin = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
-	float WaitMax = 3.f;
+	float PatrolWaitMax = 3.f;
 
 	/*
 	* AI Behavior
@@ -114,6 +114,7 @@ protected:
 	void IA_Attack();
 	virtual bool CanAttack() override;
 	virtual void HandleDamage(float DamageAmount) override;
+	virtual void AttackEnd() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI Navigation")
 	AActor* CombatTarget;

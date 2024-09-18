@@ -37,6 +37,7 @@ enum class EEnemyState : uint8
 	EES_Chasing		UMETA(DisplayName = "Chasing"),
 	EES_Atttacking	UMETA(DisplayName = "Attacking"),
 	EES_Engaged		UMETA(DisplayName = "Engaged"),
+	EES_NoState		UMETA(DisplayName = "No State"),
 };
 
 UENUM(BlueprintType)
