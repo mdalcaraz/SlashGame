@@ -116,8 +116,7 @@ protected:
 	virtual void HandleDamage(float DamageAmount) override;
 	virtual void AttackEnd() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI Navigation")
-	AActor* CombatTarget;
+
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;

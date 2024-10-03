@@ -46,8 +46,15 @@ protected:
 	void SpawnHitParticules(const FVector& ImpactPoint);
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	void PlayHitReactMontage(const FName& SectionName);
+	void StopAttackMontage();
 	int32 PlayAttackMontage();
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
+
+	UFUNCTION(BLueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BLueprintCallable)
+	FVector GetRotationWarpTarget();
 
 	virtual bool CanAttack();
 	bool IsAlive();
@@ -61,6 +68,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	EItemType	 WeaponEquippedType = EItemType::EOC_None;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI Navigation")
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	double WarptargetDistance = 75.f;
 	/**
 	* Animation montages
 	*/

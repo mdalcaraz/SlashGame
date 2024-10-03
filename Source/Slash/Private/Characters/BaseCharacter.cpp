@@ -9,7 +9,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "Components/AttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Slash/DebugMacros.h"
 
 
 // Sets default values
@@ -95,6 +95,15 @@ void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
 	}
 }
 
+void ABaseCharacter::StopAttackMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Stop(0.25f, AttackMontage);
+	}
+}
+
 int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames)
 {
 	if (SectionNames.Num() <= 0) return 0;
@@ -102,6 +111,28 @@ int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArr
 	const int32 Selection = FMath::RandRange(0, MaxSectionIndex);
 	PlayMontageSection(Montage, SectionNames[Selection]);
 	return Selection;
+}
+
+FVector ABaseCharacter::GetTranslationWarpTarget()
+{
+	if (CombatTarget == nullptr) return FVector();
+
+	const FVector CombatTargetLocation = CombatTarget->GetActorLocation();
+	const FVector Location = GetActorLocation();
+
+	FVector TargetToMe = (Location - CombatTargetLocation).GetSafeNormal();
+	TargetToMe *= WarptargetDistance;
+	return CombatTargetLocation + TargetToMe;
+	
+}
+
+FVector ABaseCharacter::GetRotationWarpTarget()
+{
+	if (CombatTarget)
+	{
+		return CombatTarget->GetActorLocation();
+	}
+	return FVector();
 }
 
 int32 ABaseCharacter::PlayAttackMontage()
