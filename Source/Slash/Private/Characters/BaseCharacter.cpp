@@ -9,7 +9,6 @@
 #include "HUD/HealthBarComponent.h"
 #include "Components/AttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Slash/DebugMacros.h"
 
 
 // Sets default values
@@ -79,7 +78,7 @@ void ABaseCharacter::SpawnHitParticules(const FVector& ImpactPoint)
 
 void ABaseCharacter::HandleDamage(float DamageAmount)
 {
-	if (Attributes && HealthBarWidget)
+	if (Attributes)
 	{
 		Attributes->ReceiveDamage(DamageAmount);
 	}

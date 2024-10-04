@@ -17,6 +17,7 @@ class UCameraComponent;
 class UGroomComponent;
 class AItem;
 class UAnimMontage;
+class USlashOverlay;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ABaseCharacter
@@ -29,7 +30,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
-	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 
 protected:
 
@@ -52,6 +54,7 @@ protected:
 	UInputAction* EAttackAction;
 
 	virtual void BeginPlay() override;
+
 
 	/** 
 	* Callbacks for input
@@ -85,6 +88,7 @@ protected:
 	void HitReactEnd();
 
 private:
+	void InitializeSlashOverlay();
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
@@ -106,10 +110,11 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
-
-
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* EquipMontage;
+
+	UPROPERTY()
+	USlashOverlay* SlashOverlay;
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
