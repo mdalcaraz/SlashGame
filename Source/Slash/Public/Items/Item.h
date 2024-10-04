@@ -63,7 +63,7 @@ protected:
 	USphereComponent* Sphere;
 
 	UPROPERTY(EditAnywhere)
-	class UNiagaraComponent* EmbersEffect;
+	class UNiagaraComponent* ItemEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Item Scale")
 	FVector Scale = FVector(1,1,1);

@@ -40,11 +40,15 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 void ABaseCharacter::Attack(const FInputActionValue& Value)
 {
-
+	if (CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
+	{
+		CombatTarget = nullptr;
+	}
 }
 
 void ABaseCharacter::Die(const FName& SectionName)
 {
+	Tags.Add(FName("Dead"));
 }
 
 void ABaseCharacter::DisableCapsule()

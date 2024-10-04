@@ -231,8 +231,10 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 
 void AEnemy::Attack(const FInputActionValue& Value = FInputActionValue())
 {
-	EnemyState = EEnemyState::EES_Engaged;
 	Super::Attack(Value);
+	if (CombatTarget == nullptr) return;
+
+	EnemyState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
 }
 

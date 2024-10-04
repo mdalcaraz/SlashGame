@@ -226,6 +226,16 @@ void ASlashCharacter::Jump()
 	}
 }
 
+void ASlashCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
+}
+
+void ASlashCharacter::AddSouls(ASoul* Soul)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ADD SOULS"));
+}
+
 bool ASlashCharacter::IsUnoccupied()
 {
 	return ActionState == EActionState::EAS_Unoccupied;
@@ -294,6 +304,7 @@ void ASlashCharacter::HitReactEnd()
 
 void ASlashCharacter::Die(const FName& SectionName)
 {
+	Super::Die(SectionName);
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
 
