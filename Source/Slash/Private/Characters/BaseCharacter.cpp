@@ -193,6 +193,11 @@ bool ABaseCharacter::IsAlive()
 	return Attributes && Attributes->IsAlive();
 }
 
+void ABaseCharacter::DisableMeshCollision()
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void ABaseCharacter::AttackEnd()
 {
 }

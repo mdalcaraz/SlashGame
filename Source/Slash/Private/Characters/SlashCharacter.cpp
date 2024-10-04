@@ -117,10 +117,6 @@ void ASlashCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ASlashCharacter::Jump(const FInputActionValue& Value)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Saltando"));
-}
 
 void ASlashCharacter::EKeyPressed(const FInputActionValue& Value)
 {
@@ -197,7 +193,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
 		EnhancedInputComponent->BindAction(EKeyPressAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
 		EnhancedInputComponent->BindAction(EAttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
 	}
@@ -208,13 +204,39 @@ void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
-	ActionState = EActionState::EAS_HitReaction;
+	if(Attributes && Attributes->GetHealthPercent() > 0.f)
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
+
 }
 
 float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	HandleDamage(DamageAmount);
+	SetHUDHealth();
 	return DamageAmount;
+}
+
+void ASlashCharacter::Jump()
+{
+	if (IsUnoccupied())
+	{
+		Super::Jump();
+	}
+}
+
+bool ASlashCharacter::IsUnoccupied()
+{
+	return ActionState == EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::SetHUDHealth()
+{
+	if (SlashOverlay && Attributes)
+	{
+		SlashOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
 }
 
 
@@ -268,6 +290,23 @@ void ASlashCharacter::FinishEquipping()
 void ASlashCharacter::HitReactEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::Die(const FName& SectionName)
+{
+	ActionState = EActionState::EAS_Dead;
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
+
+	//TODO: Refactor
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
+	}
+	DisableCapsule();
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	DisableMeshCollision();
 }
 
 void ASlashCharacter::PlayEquipMontage(const FName& SectionName)

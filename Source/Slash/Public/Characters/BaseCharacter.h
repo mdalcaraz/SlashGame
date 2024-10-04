@@ -58,6 +58,7 @@ protected:
 
 	virtual bool CanAttack();
 	bool IsAlive();
+	void DisableMeshCollision();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
@@ -135,4 +136,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	UParticleSystem* HitParticles;
+
+public:
+	FORCEINLINE EDeathPose GetDeathPose() const { return DeathPose; }
+
 };

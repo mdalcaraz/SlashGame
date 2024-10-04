@@ -31,6 +31,8 @@ public:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Jump() override;
+
 
 
 protected:
@@ -61,7 +63,6 @@ protected:
 	*/
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Jump(const FInputActionValue& Value);
 	void EKeyPressed(const FInputActionValue& Value);
 	virtual void Attack(const FInputActionValue& Value) override;
 
@@ -87,8 +88,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
+	virtual void Die(const FName& SectionName) override;
+
 private:
+	bool IsUnoccupied();
 	void InitializeSlashOverlay();
+	void SetHUDHealth();
 
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
@@ -119,4 +124,6 @@ private:
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE EActionState GetActionState() const { return ActionState; }
+
 };
