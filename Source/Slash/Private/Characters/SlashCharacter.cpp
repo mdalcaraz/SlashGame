@@ -11,6 +11,8 @@
 #include "GroomComponent.h"
 #include "Components/AttributeComponent.h"
 #include "Items/Item.h"
+#include "Items/Soul.h"
+#include "Items/Treasure.h"
 #include "Items/Weapons/Weapon.h"
 #include "Items/ItemsTypes.h"
 #include "Animation/AnimMontage.h"
@@ -233,7 +235,20 @@ void ASlashCharacter::SetOverlappingItem(AItem* Item)
 
 void ASlashCharacter::AddSouls(ASoul* Soul)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ADD SOULS"));
+	if (Attributes && SlashOverlay)
+	{
+		Attributes->AddSouls(Soul->GetSouls());
+		SlashOverlay->SetSouls(Attributes->GetSouls());
+	}
+}
+
+void ASlashCharacter::AddGold(ATreasure* Treasure)
+{
+	if (Attributes && SlashOverlay)
+	{
+		Attributes->AddGold(Treasure->GetGold());
+		SlashOverlay->SetGold(Attributes->GetGold());
+	}
 }
 
 bool ASlashCharacter::IsUnoccupied()

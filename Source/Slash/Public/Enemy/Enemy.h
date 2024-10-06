@@ -101,10 +101,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ChasingSpeed = 300.f;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<class ASoul> SoulClass;
+
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void Die(const FName& SectionName) override;
+	void SpawnSoul();
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
