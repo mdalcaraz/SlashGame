@@ -106,6 +106,20 @@ void ASlashCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
+void ASlashCharacter::Dodge(const FInputActionValue& Value)
+{
+	if (IsOccupied() || !HasEnoughStamina()) return;
+	PlayDodgeMontage();
+	ActionState = EActionState::EAS_Dodge;
+	if (Attributes && SlashOverlay)
+	{
+		Attributes->UseStamina(Attributes->GetDodgeCost());
+		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
+}
+
+
+
 void ASlashCharacter::Look(const FInputActionValue& Value)
 {
 
@@ -182,10 +196,12 @@ void ASlashCharacter::Attack(const FInputActionValue& Value)
 void ASlashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (Attributes && SlashOverlay)
+	{
+		Attributes->RegenStamina(DeltaTime);
+		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
 }
-
-
 
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -196,6 +212,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
+		EnhancedInputComponent->BindAction(EDodgeAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Dodge);
 		EnhancedInputComponent->BindAction(EKeyPressAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
 		EnhancedInputComponent->BindAction(EAttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
 	}
@@ -335,6 +352,15 @@ void ASlashCharacter::Die(const FName& SectionName)
 	DisableMeshCollision();
 }
 
+bool ASlashCharacter::HasEnoughStamina()
+{
+	return Attributes && Attributes->GetStamina() > Attributes->GetDodgeCost();
+}
+
+bool ASlashCharacter::IsOccupied()
+{
+	return ActionState != EActionState::EAS_Unoccupied;
+}
 void ASlashCharacter::PlayEquipMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -346,6 +372,11 @@ void ASlashCharacter::PlayEquipMontage(const FName& SectionName)
 }
 
 void ASlashCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharacter::DodgeEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
 }

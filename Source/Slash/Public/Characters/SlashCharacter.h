@@ -61,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* EAttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* EDodgeAction;
+
 	virtual void BeginPlay() override;
 
 
@@ -68,6 +71,8 @@ protected:
 	* Callbacks for input
 	*/
 	void Move(const FInputActionValue& Value);
+	void Dodge(const FInputActionValue& Value);
+
 	void Look(const FInputActionValue& Value);
 	void EKeyPressed(const FInputActionValue& Value);
 	virtual void Attack(const FInputActionValue& Value) override;
@@ -76,6 +81,7 @@ protected:
 	* Play montage functions
 	*/
 	virtual void AttackEnd() override;
+	virtual void DodgeEnd() override;
 	virtual bool CanAttack() override;
 
 	void PlayEquipMontage(const FName& SectionName);
@@ -95,6 +101,8 @@ protected:
 	void HitReactEnd();
 
 	virtual void Die(const FName& SectionName) override;
+	bool HasEnoughStamina();
+	bool IsOccupied();
 
 private:
 	bool IsUnoccupied();

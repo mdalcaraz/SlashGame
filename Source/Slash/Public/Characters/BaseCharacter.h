@@ -48,6 +48,7 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName);
 	void StopAttackMontage();
 	int32 PlayAttackMontage();
+	virtual void PlayDodgeMontage();
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
 	UFUNCTION(BLueprintCallable)
@@ -62,6 +63,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DodgeEnd();
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	EOcuppedHand WeaponOcuppedHand = EOcuppedHand::EOC_None;
@@ -97,6 +101,8 @@ protected:
 	UAnimMontage* LeftDeathMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UAnimMontage* RightDeathMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UAnimMontage* DodgeMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FName> NoWeaponAttackMontageSections;
