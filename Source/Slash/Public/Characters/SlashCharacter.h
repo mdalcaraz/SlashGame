@@ -100,7 +100,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
-	virtual void Die(const FName& SectionName) override;
+	virtual void Die_Implementation(const FName& SectionName) override;
 	bool HasEnoughStamina();
 	bool IsOccupied();
 

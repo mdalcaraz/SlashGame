@@ -110,7 +110,7 @@ private:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void Die(const FName& SectionName) override;
+	virtual void Die_Implementation(const FName& SectionName) override;
 	void SpawnSoul();
 	bool InTargetRange(AActor* Target, double Radius);
 	void MoveToTarget(AActor* Target);

@@ -46,7 +46,7 @@ void ABaseCharacter::Attack(const FInputActionValue& Value)
 	}
 }
 
-void ABaseCharacter::Die(const FName& SectionName)
+void ABaseCharacter::Die_Implementation(const FName& SectionName)
 {
 	Tags.Add(FName("Dead"));
 }

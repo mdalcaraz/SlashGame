@@ -334,9 +334,9 @@ void ASlashCharacter::HitReactEnd()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
-void ASlashCharacter::Die(const FName& SectionName)
+void ASlashCharacter::Die_Implementation(const FName& SectionName)
 {
-	Super::Die(SectionName);
+	Super::Die_Implementation(SectionName);
 	ActionState = EActionState::EAS_Dead;
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
 

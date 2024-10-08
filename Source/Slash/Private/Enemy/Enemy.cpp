@@ -156,8 +156,9 @@ void AEnemy::BeginPlay()
 	}
 }
 
-void AEnemy::Die(const FName& SectionName)
+void AEnemy::Die_Implementation(const FName& SectionName)
 {
+	Super::Die_Implementation(SectionName);
 	EnemyState = EEnemyState::EES_Dead;
 	ClearAttackTimer();
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Block);
